@@ -3,6 +3,7 @@ var pxSz = 4;
 function setup() {
   createCanvas( 480, 640 )
   capture = createCapture( VIDEO )
+  capture.elt.setAttribute('playsinline', '');
   capture.hide()
   d = pixelDensity();
   noStroke();
