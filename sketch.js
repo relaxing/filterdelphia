@@ -1,16 +1,27 @@
 var pxSz = 4;
+var w = 480;
+var h = 640;
 
 function setup() {
-  createCanvas( 480, 640 )
-  capture = createCapture( VIDEO )
+  capture = createCapture({
+        audio: false,
+        video: {
+            width: w,
+            height: h
+        }
+    }, function() {
+        console.log('capture ready.')
+    });
   capture.elt.setAttribute('playsinline', '');
   capture.hide()
+  capture.size(w, h);
   d = pixelDensity();
   noStroke();
   palette = [color( 75, 190, 255 ),
              color( 130, 14, 6 ),
              color( 194, 150, 238 ),
              color( 50, 205, 250)]
+  createCanvas( w, h )
 }
 
 function draw() {
