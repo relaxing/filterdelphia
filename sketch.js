@@ -1,6 +1,7 @@
 var pxSz = 4;
-var w = 480;
-var h = 640;
+var w = 240;
+var h = 320;
+var capture;
 
 function setup() {
   capture = createCapture({
@@ -25,7 +26,7 @@ function setup() {
 }
 
 function draw() {
-  image(capture, 0, 0, width, height, 640/2, 0, 480, 640)
+  image(capture,0,0,width,height);//,240,120,180,240);
   loadPixels()
   for( x = 0; x < width; x+=pxSz ) {
     for( y = 0; y < height; y+=pxSz ) {
