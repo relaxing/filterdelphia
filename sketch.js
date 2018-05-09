@@ -5,11 +5,16 @@ var capture;
 
 function setup() {
   capture = createCapture({
-        audio: false,
-        video: {
-            width: w,
-            height: h
-        }
+      audio: false,
+      video: {
+          width: w,
+          height: h
+      },
+      mandatory: {
+        minWidth: w,
+        minHeight: h
+      },
+      optional: [{ maxFrameRate: 30 }]
     }, function() {
         console.log('capture ready.')
     });
