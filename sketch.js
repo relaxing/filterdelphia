@@ -5,6 +5,7 @@ var canvas;
 var d = 1;
 var pxSz = 4;
 var palette = [];
+var rands = [];
 
 function setup() {
   capture = createCapture({
@@ -17,11 +18,13 @@ function setup() {
   //console.log(capture.width + " " + capture.height)
   capture.hide();
   d = pixelDensity();
-  palette = [color( 75, 190, 255 ),
-             color( 130, 14, 6 ),
-             color( 194, 150, 238 ),
-             color( 50, 205, 250)]
+  transp = 128;
+  palette = [color( 130, 14, 6, transp ),
+             color( 75, 190, 255, transp ),
+             color( 194, 150, 238, transp ),
+             color( 50, 205, 250, transp )]
   noStroke();
+  rands = Array.from({length: ((width)*(height))}, () => Math.floor(random(pxSz,pxSz*2)));
 }
 
 function draw() {
@@ -29,20 +32,23 @@ function draw() {
   loadPixels()
   for( x = 0; x < width; x+=pxSz ) {
     for( y = 0; y < height; y+=pxSz ) {
-      idx = 4 * ((y * d) * width * d + (x * d ));
+      idx = pxSz * ((y * d) * width * d + (x * d));
       c = color( pixels[idx], pixels[idx+1], pixels[idx+2] )
-      b = brightness(c)
-      if( b < 20 ) {
-        c = palette[0]
-      } else if( b < 45 ) {
-        c = palette[1]
-      } else if( b < 55 ) {
-        c = palette[2]
-      } else {
-        c = palette[3]
-      }
+      //if(x > width / 2 ) {
+        b = brightness(c)
+        if( b < 40 ) {
+          c = palette[0]
+        } else if( b < 75 ) {
+          c = palette[1]
+        } else if( b < 95 ) {
+          c = palette[2]
+        } else {
+          c = palette[3]
+        }
+    //  }
+      //stroke(c)
       fill(c)
-      rect( x, y, random(pxSz*2), random(pxSz*2) )
+      rect( x, y, rands[(idx/pxSz)/d], rands[(idx/pxSz)/d]  )
     }
   }
 }
