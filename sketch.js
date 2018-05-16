@@ -4,7 +4,7 @@ var bpp = 4;
 var capture;
 var canvas;
 var d = 1;
-var currFilter = lastFilter = 3;
+var currFilter = lastFilter = 0;
 var filter_setup = [];
 var filter_draw = [];
 var filter_selectorsX = [];
@@ -26,7 +26,7 @@ function setup() {
   capture.elt.setAttribute('playsinline', '');
   capture.elt.setAttribute('autoplay', '');
   canvas = createCanvas(w,h);
-  //console.log(capture.width + " " + capture.height)
+  console.log(capture.width + " " + capture.height)
   capture.hide();
   //d = pixelDensity();
   pixelDensity(1);
@@ -96,7 +96,7 @@ function draw() {
 }
 
 
-function mouseClicked() {
+function mouseclicked() {
   for(i=0;i<filter_selectorsX.length;i++) {
     x = filter_selectorsX[i];
     y = height-border-ellsz;
@@ -117,7 +117,7 @@ function mouseClicked() {
 }
 
 function touchEnded() {
-  mouseClicked();
+  mouseclicked();
 }
 
 function takePhoto() {
