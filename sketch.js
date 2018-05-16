@@ -1,11 +1,22 @@
 var w = 640;
 var h = 480;
+var bpp = 4;
 var capture;
 var canvas;
 var d = 1;
-var pxSz = 4;
-var palette = [];
-var rands = [];
+var currFilter = lastFilter = 3;
+var filter_setup = [];
+var filter_draw = [];
+var filter_selectorsX = [];
+var filter_selectorsSz = [30,40,50,40,30];
+
+function preload() {
+  bockhat = loadImage("images/bockHat.png");
+  pipe = loadImage("images/bockPipe.png");
+  boyface = loadImage("images/boyface.png");
+  dragon = loadImage("images/dragonface.png");
+  monkeyhat = loadImage("images/monkeyhat.png");
+}
 
 function setup() {
   capture = createCapture({
@@ -14,41 +25,97 @@ function setup() {
   });
   capture.elt.setAttribute('playsinline', '');
   capture.elt.setAttribute('autoplay', '');
-  canvas = createCanvas(w,h);//capture.width,capture.height);
+  canvas = createCanvas(w,h);
   //console.log(capture.width + " " + capture.height)
   capture.hide();
-  d = pixelDensity();
-  transp = 128;
-  palette = [color( 130, 14, 6, transp ),
-             color( 75, 190, 255, transp ),
-             color( 194, 150, 238, transp ),
-             color( 50, 205, 250, transp )]
+  //d = pixelDensity();
+  pixelDensity(1);
   noStroke();
-  rands = Array.from({length: ((width)*(height))}, () => Math.floor(random(pxSz,pxSz*2)));
+  filter_setup.push(setup_noeffect);
+  filter_setup.push(setup_posterize);
+  filter_setup.push(setup_pointilist);
+  filter_setup.push(setup_arbock);
+  filter_setup.push(setup_arboy);
+  filter_setup.push(setup_ardragon);
+  filter_setup.push(setup_linedrawing);
+  filter_setup.push(setup_armonkeyhat);
+  filter_setup.push(setup_pointilisth);
+  filter_setup.push(setup_posterizeb);
+  filter_setup.push(setup_splitposter);
+  filter_setup.push(setup_stainglass);
+  filter_setup.push(setup_statue);
+
+  filter_draw.push(draw_noeffect);
+  filter_draw.push(draw_posterize);
+  filter_draw.push(draw_pointilist);
+  filter_draw.push(draw_arbock);
+  filter_draw.push(draw_arboy);
+  filter_draw.push(draw_ardragon);
+  filter_draw.push(draw_linedrawing);
+  filter_draw.push(draw_armonkeyhat);
+  filter_draw.push(draw_pointilisth);
+  filter_draw.push(draw_posterizeb);
+  filter_draw.push(draw_splitposter);
+  filter_draw.push(draw_stainglass);
+  filter_draw.push(draw_statue);
+
+  filter_setup[currFilter]();
+
+  border = 10;
+  ellsz = 50;
+  ellx = (width/2)-(2*(border+ellsz));
+  numSelectors = 5;
+  for(i=0;i<numSelectors;i++) {
+    filter_selectorsX.push( ellx );
+    ellx+=border+ellsz;
+  }
 }
 
 function draw() {
   image(capture, 0, 0, width, height);
-  loadPixels()
-  for( x = 0; x < width; x+=pxSz ) {
-    for( y = 0; y < height; y+=pxSz ) {
-      idx = pxSz * ((y * d) * width * d + (x * d));
-      c = color( pixels[idx], pixels[idx+1], pixels[idx+2] )
-      //if(x > width / 2 ) {
-        b = brightness(c)
-        if( b < 40 ) {
-          c = palette[0]
-        } else if( b < 75 ) {
-          c = palette[1]
-        } else if( b < 95 ) {
-          c = palette[2]
-        } else {
-          c = palette[3]
-        }
-    //  }
-      //stroke(c)
-      fill(c)
-      rect( x, y, rands[(idx/pxSz)/d], rands[(idx/pxSz)/d]  )
+  loadPixels();
+  var pxSz = 2;
+  if(currFilter != lastFilter){
+    console.log(lastFilter + "->" + currFilter);
+    lastFilter = currFilter;
+    filter_setup[currFilter]();
+  }
+  filter_draw[currFilter](pixels, pxSz);
+  //draw menu
+  elly = height-border-ellsz;
+  fill(0,0,0,16);
+  stroke(255);
+  ellipseMode(CENTER);
+  for(i=0;i<filter_selectorsX.length;i++) {
+    ellx = filter_selectorsX[i];
+    ellsz = filter_selectorsSz[i];
+    ellipse(ellx,elly,ellsz,ellsz)
+  }
+
+  noStroke();
+}
+
+
+function mouseClicked() {
+  for(i=0;i<filter_selectorsX.length;i++) {
+    x = filter_selectorsX[i];
+    y = height-border-ellsz;
+    ellsz = filter_selectorsSz[i];
+    if ( mouseX >= x-ellsz/2 && mouseX <= x+ellsz/2 &&
+         mouseY >= y-ellsz/2 && mouseY <= y+ellsz/2 ) {
+      console.log("selector "+i+" hit")
+      if(i>2) {
+        currFilter+=i-2;
+      } else if (i<2) {
+        currFilter-=2-i;
+      } else {
+        takePhoto();
+      }
+      currFilter = constrain( currFilter, 0, filter_setup.length-1 )
     }
   }
+}
+
+function takePhoto() {
+
 }
