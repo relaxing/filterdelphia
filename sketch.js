@@ -116,6 +116,10 @@ function mouseClicked() {
   }
 }
 
+function touchEnded() {
+  mouseClicked();
+}
+
 function takePhoto() {
 
 }
