@@ -12,6 +12,8 @@ function setup_pointilist() {
 }
 
 function draw_pointilist(pixels, pxSz) {
+  image(capture, 0, 0, width, height);
+  loadPixels();
   for( x = 0; x < width; x+=15 ) {
     for( y = 0; y < height; y+=15 ) {
       idx = bpp * ((y * d) * width * d + (x * d ));

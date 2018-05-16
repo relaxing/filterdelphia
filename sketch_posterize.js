@@ -10,6 +10,8 @@ function setup_posterize() {
 }
 
 function draw_posterize(pixels, pxSz){
+  image(capture, 0, 0, width, height);
+  loadPixels();
   for( x = 0; x < width; x+=pxSz ) {
     for( y = 0; y < height; y+=pxSz ) {
       idx = bpp * ((y * d) * width * d + (x * d));

@@ -72,8 +72,8 @@ function setup() {
 }
 
 function draw() {
-  image(capture, 0, 0, width, height);
-  loadPixels();
+  //image(capture, 0, 0, width, height);
+  //loadPixels();
   var pxSz = 2;
   if(currFilter != lastFilter){
     console.log(lastFilter + "->" + currFilter);

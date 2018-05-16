@@ -12,6 +12,7 @@ function setup_splitposter() {
 function draw_splitposter(pixels, pxSz) {
   new_w = 480*(width/height);
   image(capture,0,0,width,height);//,640/2-new_w/2,0,new_w,480);
+  loadPixels();
   imgURI = canvas.elt.toDataURL("image/png");
   face = new Image(width,height);
   face.src = imgURI;
