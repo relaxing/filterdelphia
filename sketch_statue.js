@@ -1,13 +1,14 @@
 function setup_statue() {
   console.log("statue");
   noStroke();
-  palette = [color(0, 10, 10),
-   color( 244, 244, 244 ),
-   color(200, 200, 200),
-   color(150, 150, 150),
-   color(100, 100, 100),
-   color(50, 50, 50),
-   color(255, 255, 255) ]
+  var transp = 128;
+  palette = [color(0, 10, 10, transp),
+   color( 244, 244, 244, transp),
+   color(200, 200, 200, transp),
+   color(150, 150, 150, transp),
+   color(100, 100, 100, transp),
+   color(50, 50, 50, transp),
+   color(255, 255, 255, transp) ]
 }
 
 function draw_statue(pixels, pxSz) {
@@ -34,11 +35,11 @@ function draw_statue(pixels, pxSz) {
         c = palette[4]
       } else if( b < 6 * 52 ) {
         c = palette[5]
-      } else if( b < 7 * 52 ) {
+      } else {
         c = palette[6]
       }
       fill( c )
-      rect( x, y, 15, 15)
+      rect( x, y, 12, 12)
     }
   }
 }
