@@ -4,11 +4,13 @@ var bpp = 4;
 var capture;
 var canvas;
 var d = 1;
-var currFilter = lastFilter = 0;
+var currFilter = lastFilter = 1;
 var filter_setup = [];
 var filter_draw = [];
 var filter_selectorsX = [];
 var filter_selectorsSz = [30,40,50,40,30];
+
+var posterizeShader;
 
 function preload() {
   bockhat = loadImage("images/bockHat.png");
@@ -16,6 +18,8 @@ function preload() {
   boyface = loadImage("images/boyface.png");
   dragon = loadImage("images/dragonface.png");
   monkeyhat = loadImage("images/monkeyhat.png");
+
+  posterizeShader = loadShader('posterize.vert', 'posterize.cpp');
 }
 
 function setup() {
@@ -25,8 +29,10 @@ function setup() {
   });
   capture.elt.setAttribute('playsinline', '');
   capture.elt.setAttribute('autoplay', '');
-  canvas = createCanvas(w,h);
+  canvas = createCanvas(w,h,WEBGL);
+  //canvas.elt = WebGLDebugUtils.makeDebugContext(canvas.elt.getContext("webgl"));
   console.log(capture.width + " " + capture.height)
+  capture.size(w,h);
   capture.hide();
   //d = pixelDensity();
   pixelDensity(1);
@@ -72,6 +78,7 @@ function setup() {
 }
 
 function draw() {
+  //rect(0,0,width, height);
   //image(capture, 0, 0, width, height);
   //loadPixels();
   var pxSz = 2;
@@ -80,7 +87,14 @@ function draw() {
     lastFilter = currFilter;
     filter_setup[currFilter]();
   }
-  filter_draw[currFilter](pixels, pxSz);
+  // shader() sets the active shader with our shader
+  shader(posterizeShader);
+
+  // lets just send the cam to our shader as a uniform
+  posterizeShader.setUniform('tex0', capture);
+
+  // rect gives us some geometry on the screen
+  rect(0,0,width, height);
   //draw menu
   elly = height-border-ellsz;
   fill(0,0,0,16);
@@ -122,4 +136,8 @@ function touchEnded() {
 
 function takePhoto() {
 
+}
+
+function resize_canvas(){
+  resizeCanvas(window.innerWidth,window.innerHeight,false)
 }
