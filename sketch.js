@@ -48,7 +48,7 @@ function setup() {
   });
   capture.elt.setAttribute('playsinline', '');
   capture.elt.setAttribute('autoplay', '');
-  canvas = createCanvas(w,h,WEBGL);
+  canvas = createCanvas(capture.width,capture.height,WEBGL);
   console.log(capture.width + " " + capture.height)
   capture.size(w,h);
   capture.hide();
