@@ -4,13 +4,17 @@ var bpp = 4;
 var capture;
 var canvas;
 var d = 1;
-var currFilter = lastFilter = 1;
-var filter_setup = [];
+var currFilter = lastFilter = 0;
 var filter_draw = [];
 var filter_selectorsX = [];
 var filter_selectorsSz = [30,40,50,40,30];
+var border = 10;
+var ellsz = 50;
+var ellx = 0;
+var controlsDiv;
 
 var posterizeShader;
+var noeffectShader;
 
 function preload() {
   bockhat = loadImage("images/bockHat.png");
@@ -19,7 +23,22 @@ function preload() {
   dragon = loadImage("images/dragonface.png");
   monkeyhat = loadImage("images/monkeyhat.png");
 
-  posterizeShader = loadShader('posterize.vert', 'posterize.cpp');
+  arbock_icon = loadImage("images/arbock.png");
+  circle_icon = loadImage("images/circle.png");
+
+  noeffectShader = loadShader('shader.vert', 'noeffect.cpp');
+  posterizeShader = loadShader('shader.vert', 'posterize.cpp');
+  pointilistShader = loadShader('shader.vert', 'pointilist.cpp');
+  // filter_draw.push(draw_arbock);
+  // filter_draw.push(draw_arboy);
+  // filter_draw.push(draw_ardragon);
+  linedrawingShader = loadShader('shader.vert', 'linedrawing.cpp');
+  //filter_draw.push(draw_armonkeyhat);
+  pointilisthShader = loadShader('shader.vert', 'pointilisth.cpp');
+  posterizebShader = loadShader('shader.vert', 'posterizeb.cpp');
+  //filter_draw.push(draw_splitposter);
+  stainglassShader = loadShader('shader.vert', 'stainglass.cpp');
+  statueShader = loadShader('shader.vert', 'statue.cpp');
 }
 
 function setup() {
@@ -30,42 +49,32 @@ function setup() {
   capture.elt.setAttribute('playsinline', '');
   capture.elt.setAttribute('autoplay', '');
   canvas = createCanvas(w,h,WEBGL);
-  //canvas.elt = WebGLDebugUtils.makeDebugContext(canvas.elt.getContext("webgl"));
   console.log(capture.width + " " + capture.height)
   capture.size(w,h);
   capture.hide();
+  canvas.style("position", "relative");
+  canvas.parent('#app');
+  controlsDiv = select("#controls");
   //d = pixelDensity();
   pixelDensity(1);
   noStroke();
-  filter_setup.push(setup_noeffect);
-  filter_setup.push(setup_posterize);
-  filter_setup.push(setup_pointilist);
-  filter_setup.push(setup_arbock);
-  filter_setup.push(setup_arboy);
-  filter_setup.push(setup_ardragon);
-  filter_setup.push(setup_linedrawing);
-  filter_setup.push(setup_armonkeyhat);
-  filter_setup.push(setup_pointilisth);
-  filter_setup.push(setup_posterizeb);
-  filter_setup.push(setup_splitposter);
-  filter_setup.push(setup_stainglass);
-  filter_setup.push(setup_statue);
 
-  filter_draw.push(draw_noeffect);
-  filter_draw.push(draw_posterize);
-  filter_draw.push(draw_pointilist);
-  filter_draw.push(draw_arbock);
-  filter_draw.push(draw_arboy);
-  filter_draw.push(draw_ardragon);
-  filter_draw.push(draw_linedrawing);
-  filter_draw.push(draw_armonkeyhat);
-  filter_draw.push(draw_pointilisth);
-  filter_draw.push(draw_posterizeb);
-  filter_draw.push(draw_splitposter);
-  filter_draw.push(draw_stainglass);
-  filter_draw.push(draw_statue);
+  filter_draw.push(noeffectShader);
+  filter_draw.push(posterizeShader);
+  filter_draw.push(pointilistShader);
+  // filter_draw.push(draw_arbock);
+  // filter_draw.push(draw_arboy);
+  // filter_draw.push(draw_ardragon);
+  filter_draw.push(linedrawingShader);
+  //filter_draw.push(draw_armonkeyhat);
+  filter_draw.push(pointilisthShader);
+  filter_draw.push(posterizebShader);
+  //filter_draw.push(draw_splitposter);
+  filter_draw.push(stainglassShader);
+  filter_draw.push(statueShader);
 
-  filter_setup[currFilter]();
+
+  resize_canvas()
 
   border = 10;
   ellsz = 50;
@@ -75,69 +84,76 @@ function setup() {
     filter_selectorsX.push( ellx );
     ellx+=border+ellsz;
   }
+
+  drawMenu();
 }
 
 function draw() {
-  //rect(0,0,width, height);
-  //image(capture, 0, 0, width, height);
-  //loadPixels();
-  var pxSz = 2;
   if(currFilter != lastFilter){
     console.log(lastFilter + "->" + currFilter);
     lastFilter = currFilter;
-    filter_setup[currFilter]();
   }
-  // shader() sets the active shader with our shader
-  shader(posterizeShader);
 
-  // lets just send the cam to our shader as a uniform
-  posterizeShader.setUniform('tex0', capture);
-
-  // rect gives us some geometry on the screen
+  shader(filter_draw[currFilter]);
+  filter_draw[currFilter].setUniform('tex0', capture);
+  filter_draw[currFilter].setUniform('width', width);
   rect(0,0,width, height);
-  //draw menu
-  elly = height-border-ellsz;
-  fill(0,0,0,16);
-  stroke(255);
-  ellipseMode(CENTER);
+
+}
+
+function drawMenu() {
   for(i=0;i<filter_selectorsX.length;i++) {
     ellx = filter_selectorsX[i];
     ellsz = filter_selectorsSz[i];
-    ellipse(ellx,elly,ellsz,ellsz)
-  }
-
-  noStroke();
-}
-
-
-function mouseclicked() {
-  for(i=0;i<filter_selectorsX.length;i++) {
-    x = filter_selectorsX[i];
-    y = height-border-ellsz;
-    ellsz = filter_selectorsSz[i];
-    if ( mouseX >= x-ellsz/2 && mouseX <= x+ellsz/2 &&
-         mouseY >= y-ellsz/2 && mouseY <= y+ellsz/2 ) {
-      console.log("selector "+i+" hit")
-      if(i>2) {
-        currFilter+=i-2;
-      } else if (i<2) {
-        currFilter-=2-i;
-      } else {
-        takePhoto();
-      }
-      currFilter = constrain( currFilter, 0, filter_setup.length-1 )
-    }
+    elly = height-border-ellsz;
+    selectIcon = createImg("images/circle.png");
+    selectIcon.elt.width = ellsz;
+    selectIcon.elt.height = ellsz;
+    selectIcon.attribute( "onclick", "selectorClicked("+i+");");
+    selectIcon.style("position","relative");
+    selectIcon.style("bottom",height-elly+"px");
+    selectIcon.style("left",ellx+"px");
+    selectIcon.parent("#controls");
   }
 }
 
-function touchEnded() {
-  mouseclicked();
+
+function selectorClicked(selectorId) {
+  if(selectorId>2) {
+    currFilter+=selectorId-2;
+  } else if (selectorId<2) {
+    currFilter-=2-selectorId;
+  } else {
+    takePhoto();
+  }
+  currFilter = constrain( currFilter, 0, filter_draw.length-1 )
 }
+
 
 function takePhoto() {
-
+  snapImgURL = canvas.elt.toDataURL("image/png");
+  snapImg = new Image(width,height);
+  snapImg.src = snapImgURL;
+  snapA = createA(snapImgURL);
+  snapA.attribute("download", "filterdelphia.png");
+  snapA.elt.click();
+  snapImg.width = width/4;
+  snapImg.height = height/4;
+  snapImg.border = "5px";
+  $("#snaps").append(snapImg);
+  snapA.remove();
 }
 
 function resize_canvas(){
-  resizeCanvas(window.innerWidth,window.innerHeight,false)
+  var aspectRatio = 1.0;
+  if( capture.width > capture.height ) {
+    aspectRatio = capture.height/capture.width;
+    resizeCanvas(window.innerWidth,window.innerWidth*aspectRatio,false);
+  } else {
+    aspectRatio = capture.width/capture.height;
+    resizeCanvas(window.innerHeight*aspectRatio,window.innerHeight,false);
+  }
+  select("#support").style("top",height+"px")
+  controlsDiv.style("width",width+"px");
+  controlsDiv.style("height",height+"px");
 }

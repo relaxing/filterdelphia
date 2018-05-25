@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="height:100%">
   <head>
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
     <style> body {padding: 0; margin: 0;} </style>
@@ -25,8 +25,13 @@
     <script src="sketch_stainglass.js"></script>
     <script src="sketch_statue.js"></script>
   </head>
-  <body onresize="resize_canvas()">
-
-
+  <body onresize="resize_canvas()" style="height:100%">
+    <div id="app" style="position: relative;">
+        <div id="controls" style="position: absolute; top:0px; left:0px; z-index:9999;"></div>
+    </div>
+    <div id="support" style="position:relative; top:100%">
+      <div id="description"><p>&nbsp;</p></div>
+      <div id="snaps"><p>&nbsp;</p></div>
+    </div>
   </body>
 </html>
