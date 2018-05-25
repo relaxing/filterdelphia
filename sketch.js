@@ -8,6 +8,7 @@ var currFilter = lastFilter = 0;
 var filter_draw = [];
 var filter_selectorsX = [];
 var filter_selectorsSz = [30,40,50,40,30];
+var filter_selectorsIcons = [];
 var border = 10;
 var ellsz = 50;
 var ellx = 0;
@@ -17,15 +18,34 @@ var posterizeShader;
 var noeffectShader;
 
 function preload() {
+  // AR assets
   bockhat = loadImage("images/bockHat.png");
   pipe = loadImage("images/bockPipe.png");
   boyface = loadImage("images/boyface.png");
   dragon = loadImage("images/dragonface.png");
   monkeyhat = loadImage("images/monkeyhat.png");
 
-  arbock_icon = loadImage("images/arbock.png");
+  // Selection Icons
   circle_icon = loadImage("images/circle.png");
+  filter_selectorsIcons.push("images/circle.png");
+  filter_selectorsIcons.push("images/circle.png");
+  filter_selectorsIcons.push("images/circle.png");
+  filter_selectorsIcons.push("images/posterize.png");
+  filter_selectorsIcons.push("images/pointilist.png");
+  // filter_selectorsIcons.push("images/arbock.png");
+  // filter_selectorsIcons.push(draw_arboy);
+  // filter_selectorsIcons.push(draw_ardragon);
+  filter_selectorsIcons.push("images/linedrawing.png");
+  //filter_selectorsIcons.push(draw_armonkeyhat);
+  filter_selectorsIcons.push("images/pointilisth.png");
+  filter_selectorsIcons.push("images/posterizeb.png");
+  //filter_selectorsIcons.push(draw_splitposter);
+  filter_selectorsIcons.push("images/stainedglass.png");
+  filter_selectorsIcons.push("images/statue.png");
+  filter_selectorsIcons.push("images/circle.png");
+  filter_selectorsIcons.push("images/circle.png");
 
+  // Shaders
   noeffectShader = loadShader('shader.vert', 'noeffect.cpp');
   posterizeShader = loadShader('shader.vert', 'posterize.cpp');
   pointilistShader = loadShader('shader.vert', 'pointilist.cpp');
@@ -85,7 +105,21 @@ function setup() {
     ellx+=border+ellsz;
   }
 
-  drawMenu();
+  //Setup Menu
+  for(i=0;i<filter_selectorsX.length;i++) {
+    ellx = filter_selectorsX[i];
+    ellsz = filter_selectorsSz[i];
+    elly = height-border-ellsz;
+    selectIcon = createImg(filter_selectorsIcons[i]);
+    selectIcon.elt.width = ellsz;
+    selectIcon.elt.height = ellsz;
+    selectIcon.attribute( "onclick", "selectorClicked("+i+");");
+    selectIcon.attribute("id", i);
+    selectIcon.style("position","relative");
+    selectIcon.style("bottom",height-elly+"px");
+    selectIcon.style("left",ellx+"px");
+    selectIcon.parent("#controls");
+  }
 }
 
 function draw() {
@@ -98,7 +132,6 @@ function draw() {
   filter_draw[currFilter].setUniform('tex0', capture);
   filter_draw[currFilter].setUniform('width', width);
   rect(0,0,width, height);
-
 }
 
 function drawMenu() {
@@ -106,14 +139,14 @@ function drawMenu() {
     ellx = filter_selectorsX[i];
     ellsz = filter_selectorsSz[i];
     elly = height-border-ellsz;
-    selectIcon = createImg("images/circle.png");
-    selectIcon.elt.width = ellsz;
-    selectIcon.elt.height = ellsz;
-    selectIcon.attribute( "onclick", "selectorClicked("+i+");");
-    selectIcon.style("position","relative");
-    selectIcon.style("bottom",height-elly+"px");
-    selectIcon.style("left",ellx+"px");
-    selectIcon.parent("#controls");
+    selectIcon = $("#"+i)[0];
+    if(i==2) {
+      selectIcon.src = filter_selectorsIcons[2];
+    } else {
+      newIcon = filter_selectorsIcons[currFilter+(i-2)+2];
+      console.log( selectIcon.src + "->" + newIcon );
+      selectIcon.src = newIcon;
+    }
   }
 }
 
@@ -126,7 +159,8 @@ function selectorClicked(selectorId) {
   } else {
     takePhoto();
   }
-  currFilter = constrain( currFilter, 0, filter_draw.length-1 )
+  currFilter = constrain( currFilter, 0, filter_draw.length-1 );
+  drawMenu();
 }
 
 
@@ -134,7 +168,7 @@ function takePhoto() {
   snapImgURL = canvas.elt.toDataURL("image/png");
   snapImg = new Image(width,height);
   snapImg.src = snapImgURL;
-  if( navigator.userAgent.indexOf("Safari") ) {
+  if( navigator.userAgent.indexOf("Safari") == -1 ) {
     snapA = createA(snapImgURL);
     snapA.attribute("download", "filterdelphia.png");
     snapA.elt.click();
