@@ -74,7 +74,7 @@ function setup() {
   filter_draw.push(statueShader);
 
 
-  resize_canvas()
+  resize_canvas();
 
   border = 10;
   ellsz = 50;
@@ -134,9 +134,11 @@ function takePhoto() {
   snapImgURL = canvas.elt.toDataURL("image/png");
   snapImg = new Image(width,height);
   snapImg.src = snapImgURL;
-  snapA = createA(snapImgURL);
-  snapA.attribute("download", "filterdelphia.png");
-  snapA.elt.click();
+  if( navigator.userAgent.indexOf("Safari") ) {
+    snapA = createA(snapImgURL);
+    snapA.attribute("download", "filterdelphia.png");
+    snapA.elt.click();
+  }
   snapImg.width = width/4;
   snapImg.height = height/4;
   snapImg.border = "5px";
